@@ -1,5 +1,7 @@
 [tools]
 bun = "1.2.23"
+actionlint = "1.7.7"
+pre-commit = "4.3.0"
 
 [env]
 '_'.file = ".env"
