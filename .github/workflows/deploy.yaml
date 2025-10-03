@@ -1,0 +1,42 @@
+name: Deploy to S3
+run-name: Deploy to S3
+on:
+  push:
+    branches:
+      - main
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup mise
+        uses: jdx/mise-action@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Bun build
+        run: bun run build
+        env:
+          BUN_PUBLIC_API_GATEWAY_ENDPOINT: ${{ secrets.BUN_PUBLIC_API_GATEWAY_ENDPOINT }}
+      - name: Deploy to S3
+        run: aws s3 sync ./dist s3://${{ secrets.BUCKET_NAME }} --delete
+        env:
+          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
