@@ -38,6 +38,8 @@ jobs:
         run: bun run build
         env:
           BUN_PUBLIC_API_GATEWAY_ENDPOINT: ${{ secrets.BUN_PUBLIC_API_GATEWAY_ENDPOINT }}
+      - name: Copy error document
+        run: cp ./assets/error.html ./dist/
       - name: Deploy to S3
         run: aws s3 sync ./dist s3://${{ secrets.BUCKET_NAME }} --delete
         env:
