@@ -32,6 +32,8 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ secrets.AWS_REGION }}
+      - name: Bun install
+        run: bun install
       - name: Bun build
         run: bun run build
         env:
